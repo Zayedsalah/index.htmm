@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>اختبار تحديد مستوى الإنجليزية | English Level Checker</title>
+  <style>
+    :root{
+      --bg:#0f172a;        /* slate-900 */
+      --card:#111827;      /* gray-900 */
+      --muted:#94a3b8;     /* slate-400 */
+      --text:#e5e7eb;      /* gray-200 */
+      --accent:#22c55e;    /* green-500 */
+      --accent-2:#3b82f6;  /* blue-500 */
+      --danger:#ef4444;
+      --shadow:0 10px 25px rgba(0,0,0,.25);
+      --radius:14px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:system-ui,Segoe UI,Roboto,Arial; background:linear-gradient(120deg,#0b1224,#111a33);
+      color:var(--text); -webkit-font-smoothing:antialiased; line-height:1.6;
+    }
+    header{
+      max-width:1100px; margin:24px auto 12px; padding:0 16px;
+      display:flex; align-items:center; justify-content:space-between;
+    }
+    .brand{display:flex; align-items:center; gap:12px}
+    .logo{
+      width:42px; height:42px; border-radius:10px; display:grid; place-items:center;
+      background:radial-gradient(120px 60px at 20% 20%, #44ff8f33, transparent),
+                 radial-gradient(120px 60px at 80% 80%, #4480ff33, transparent);
+      box-shadow:var(--shadow); border:1px solid #1f2937; color:#7dd3fc; font-weight:700;
+    }
+    .title{font-size:18px; font-weight:700}
+    .muted{color:var(--muted); font-size:14px}
+    .lang-toggle{
+      border:1px solid #1f2937; background:#0b1220; color:var(--text); padding:8px 14px;
+      border-radius:10px; cursor:pointer; box-shadow:var(--shadow);
+    }
+    main{max-width:1100px; margin:0 auto; padding:16px}
+    .grid{
+      display:grid; gap:16px; grid-template-columns:1fr; margin-bottom:16px;
+    }
+    @media(min-width:900px){ .grid{ grid-template-columns: 2fr 1fr; } }
+    .card{
+      background:linear-gradient(180deg,#0c1428,#0b1324); padding:18px; border-radius:var(--radius);
+      border:1px solid #1f2937; box-shadow:var(--shadow);
+    }
+    h1,h2,h3{margin:0 0 10px}
+    h1{font-size:24px}
+    h2{font-size:18px}
+    .btn{
+      background:linear-gradient(90deg,var(--accent),#16a34a); border:none; color:#052014;
+      font-weight:700; padding:12px 18px; border-radius:12px; cursor:pointer; box-shadow:var(--shadow);
+    }
+    .btn.secondary{background:linear-gradient(90deg,var(--accent-2),#2563eb); color:#071325}
+    .btn.ghost{background:#0b1220; border:1px solid #1f2937; color:var(--text)}
+    .btn.danger{background:linear-gradient(90deg,var(--danger),#b91c1c); color:#2a0707}
+    .q{
+      padding:14px; border:1px solid #1f2937; border-radius:12px; background:#0b1220; margin-bottom:10px;
+    }
+    .q-title{font-weight:700; margin-bottom:8px}
+    .options{display:grid; gap:8px}
+    label.option{
+      display:flex; gap:10px; align-items:center; padding:10px; border-radius:10px; cursor:pointer;
+      border:1px solid #1f2937; background:#0a1120;
+    }
+    label.option:hover{border-color:#334155}
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .pill{padding:4px 10px; border:1px solid #1f2937; border-radius:999px; background:#0b1220; color:var(--muted); font-size:12px}
+    .footer-note{color:var(--muted); font-size:13px; margin-top:10px}
+    .score{
+      font-size:28px; font-weight:800; color:#86efac; margin:6px 0;
+    }
+    .level{
+      display:inline-block; padding:6px 10px; border-radius:999px; background:#052e1a; border:1px solid #14532d; color:#86efac; font-weight:700;
+    }
+    textarea{
+      width:100%; min-height:110px; border-radius:12px; border:1px solid #1f2937; background:#0b1220; color:var(--text); padding:12px;
+    }
+    .progress{height:10px; background:#0b1220; border:1px solid #1f2937; border-radius:999px; overflow:hidden}
+    .bar{height:100%; width:0; background:linear-gradient(90deg,#22c55e,#3b82f6)}
+    .tips li{margin:6px 0}
+    .hidden{display:none}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo">EL</div>
+      <div>
+        <div class="title" data-i="appTitle">اختبار تحديد مستوى الإنجليزية</div>
+        <div class="muted" data-i="appSub">قصير، دقيق، وملائم لمستواك</div>
+      </div>
+    </div>
+    <button class="lang-toggle" id="toggleLang">EN</button>
+  </header>
+
+  <main class="grid">
+    <section class="card">
+      <h1 data-i="welcome">ابدأ الاختبار</h1>
+      <p class="muted" data-i="intro">سيقيّم هذا الاختبار القواعد والمفردات والقراءة. يستغرق 12–15 دقيقة. أجب دون ترجمة إن أمكن.</p>
+      <div class="row">
+        <button class="btn" id="startBtn" data-i="start">ابدأ الآن</button>
+        <button class="btn ghost" id="resetBtn" data-i="reset">إعادة الضبط</button>
+      </div>
+      <div class="footer-note" data-i="notice">لن يتم حفظ أي بيانات. هذا الاختبار للاستخدام الشخصي فقط.</div>
+    </section>
+
+    <aside class="card">
+      <h2 data-i="howWorks">كيف يعمل؟</h2>
+      <ul class="muted">
+        <li data-i="how1">اختر أفضل إجابة في كل سؤال.</li>
+        <li data-i="how2">النتيجة من 0 إلى 30، مع تقدير CEFR.</li>
+        <li data-i="how3">مهمة كتابة قصيرة لتحسين الدقة النهائية.</li>
+      </ul>
+      <div class="progress" aria-label="Progress">
+        <div class="bar" id="bar"></div>
+      </div>
+      <div class="footer-note" id="progressText">0 / 30</div>
+    </aside>
+
+    <section class="card hidden" id="quiz">
+      <h2 data-i="sectionQuiz">الأسئلة</h2>
+      <div id="questions"></div>
+      <div class="row" style="margin-top:10px;">
+        <button class="btn secondary" id="submitBtn" data-i="submit">إظهار النتيجة</button>
+        <button class="btn danger" id="clearBtn" data-i="clear">مسح الإجابات</button>
+      </div>
+    </section>
+
+    <section class="card hidden" id="writing">
+      <h2 data-i="writingTitle">مهمة الكتابة (اختياري)</h2>
+      <p class="muted" data-i="writingDesc">اكتب 5–7 جمل عن آخر احتفال بعيد ميلادك في أكتوبر: المكان، الأشخاص، نشاطان، وكيف شعرت.</p>
+      <textarea id="writingText" placeholder="اكتب هنا..."></textarea>
+      <div class="row" style="margin-top:10px;">
+        <button class="btn" id="scoreWriting" data-i="scoreWriting">تقييم سريع</button>
+        <span class="pill" id="writingScore">—</span>
+      </div>
+    </section>
+
+    <section class="card hidden" id="results">
+      <h2 data-i="resultsTitle">النتيجة</h2>
+      <div class="score" id="score">0 / 30</div>
+      <div class="level" id="level">—</div>
+      <p class="muted" id="advice">—</p>
+
+      <h3 style="margin-top:16px" data-i="nextSteps">الخطوات التالية</h3>
+      <ul class="tips" id="tips"></ul>
+      <div class="footer-note" data-i="share">انسخ نتيجتك وشاركها معي وسأعطيك خطة مخصصة لمدة أسبوعين.</div>
+    </section>
+  </main>
+
+  <script>
+    // ثنائي اللغة: عربي / إنجليزي
+    const i18n = {
+      ar:{
+        appTitle:"اختبار تحديد مستوى الإنجليزية",
+        appSub:"قصير، دقيق، وملائم لمستواك",
+        welcome:"ابدأ الاختبار",
+        intro:"سيقيّم هذا الاختبار القواعد والمفردات والقراءة. يستغرق 12–15 دقيقة. أجب دون ترجمة إن أمكن.",
+        start:"ابدأ الآن",
+        reset:"إعادة الضبط",
+        notice:"لن يتم حفظ أي بيانات. هذا الاختبار للاستخدام الشخصي فقط.",
+        howWorks:"كيف يعمل؟",
+        how1:"اختر أفضل إجابة في كل سؤال.",
+        how2:"النتيجة من 0 إلى 30، مع تقدير CEFR.",
+        how3:"مهمة كتابة قصيرة لتحسين الدقة النهائية.",
+        sectionQuiz:"الأسئلة",
+        submit:"إظهار النتيجة",
+        clear:"مسح الإجابات",
+        writingTitle:"مهمة الكتابة (اختياري)",
+        writingDesc:"اكتب 5–7 جمل عن آخر احتفال بعيد ميلادك في أكتوبر: المكان، الأشخاص، نشاطان، وكيف شعرت.",
+        scoreWriting:"تقييم سريع",
+        resultsTitle:"النتيجة",
+        nextSteps:"الخطوات التالية",
+        share:"انسخ نتيجتك وشاركها معي وسأعطيك خطة مخصصة لمدة أسبوعين.",
+        tipA1:"ركز على أساسيات القواعد (Present Simple) و1000 كلمة شائعة. استخدم تطبيقات مثل Duolingo + قصص قصيرة يومية.",
+        tipA2:"استمر على قواعد الأزمنة الأساسية والمفردات اليومية. شاهد مقاطع قصيرة مع ترجمة إنجليزية.",
+        tipB1:"طوّر الاستماع عبر بودكاست بطيء، واكتب 3 جمل يوميًا عن يومك. تعلّم 10 كلمات بأمثلة يومية.",
+        tipB2:"اقرأ مقالات قصيرة (BBC Learning English) ودوّن مفرداتك مع جمل. تمرّن على التحدث 10 دقائق يوميًا.",
+        tipC1:"ركّز على الدقة: روابط الجمل، التوازي، وأخطاء شائعة. شاهد محادثات TED مع تدوين ملخصات.",
+        progress:"تقدم"
+      },
+      en:{
+        appTitle:"English Level Checker",
+        appSub:"Short, accurate, and tailored to you",
+        welcome:"Start the test",
+        intro:"This test assesses grammar, vocabulary, and reading. Takes 12–15 minutes. Try to answer without translation.",
+        start:"Start now",
+        reset:"Reset",
+        notice:"No data is stored. This test is for personal use only.",
+        howWorks:"How it works",
+        how1:"Choose the best answer for each question.",
+        how2:"Score out of 30 with CEFR estimate.",
+        how3:"Short writing task to refine accuracy.",
+        sectionQuiz:"Questions",
+        submit:"Show result",
+        clear:"Clear answers",
+        writingTitle:"Writing task (optional)",
+        writingDesc:"Write 5–7 sentences about your last birthday celebration in October: place, people, two activities, and how you felt.",
+        scoreWriting:"Quick evaluate",
+        resultsTitle:"Result",
+        nextSteps:"Next steps",
+        share:"Copy your result and share it with me for a 2‑week custom plan.",
+        tipA1:"Focus on basics (Present Simple) and 1000 common words. Use Duolingo + daily mini-stories.",
+        tipA2:"Keep practicing core tenses and daily vocabulary. Watch short clips with English subtitles.",
+        tipB1:"Improve listening with slow podcasts; write 3 daily sentences about your day. Learn 10 words with examples.",
+        tipB2:"Read short articles (BBC Learning English); keep a vocab notebook with example sentences. Speak 10 minutes daily.",
+        tipC1:"Prioritize accuracy: linking, parallelism, and common errors. Watch TED talks and write brief summaries.",
+        progress:"Progress"
+      }
+    };
+
+    let lang = "ar";
+    const t = (key)=> i18n[lang][key];
+
+    const toggleBtn = document.getElementById('toggleLang');
+    toggleBtn.addEventListener('click', ()=>{
+      lang = lang === 'ar' ? 'en' : 'ar';
+      document.documentElement.lang = lang;
+      document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+      // swap texts
+      document.querySelectorAll('[data-i]').forEach(el=>{
+        const key = el.getAttribute('data-i');
+        el.textContent = t(key);
+      });
+      // placeholders
+      document.getElementById('writingText').placeholder = lang==='ar' ? 'اكتب هنا...' : 'Write here...';
+      toggleBtn.textContent = lang==='ar' ? 'EN' : 'AR';
+      // update progress label
+      document.getElementById('progressText').textContent = `${t('progress')}: ${answered()} / 30`;
+    });
+
+    // بنك الأسئلة (30 سؤالاً: 15 قواعد، 10 مفردات، 5 قراءة)
+    const questionsData = [
+      // Grammar (1–15)
+      {id:1,  cat:'Grammar', q:{ar:"بحلول هذا الوقت العام القادم، سأكون ___ شهادتي.", en:"By this time next year, I ___ my degree."},
+        options:['finish','will finish','will have finished','have finished'], answer:2},
+      {id:2,  cat:'Grammar', q:{ar:"كنت مهتمًا ___ الشعر اليمني لسنوات.", en:"I’ve been interested ___ Yemeni poetry for years."},
+        options:['on','in','about','for'], answer:1},
+      {id:3,  cat:'Grammar', q:{ar:"اشترت ___ هدية فريدة لوالدها.", en:"She bought ___ unique gift for her father."},
+        options:['a','an','the','—'], answer:0},
+      {id:4,  cat:'Grammar', q:{ar:"لو أنني ___ أبكر، لما فاتتني الحافلة.", en:"If I ___ earlier, I wouldn’t have missed the bus."},
+        options:['left','had left','would leave','would have left'], answer:1},
+      {id:5,  cat:'Grammar', q:{ar:"لا الطلاب ولا المعلم ___ جاهز.", en:"Neither the students nor the teacher ___ ready."},
+        options:['are','were','is','be'], answer:2},
+      {id:6,  cat:'Grammar', q:{ar:"الوثائق ___ من قبل المدير أمس.", en:"The documents ___ by the manager yesterday."},
+        options:['are signed','were signed','have signed','had sign'], answer:1},
+      {id:7,  cat:'Grammar', q:{ar:"كان عرضها ___ جدًا؛ فهمه الجميع.", en:"Her presentation was very ___; everyone understood."},
+        options:['clarity','clarify','clarified','clear'], answer:3},
+      {id:8,  cat:'Grammar', q:{ar:"لا ___ أن تتصل بها؛ لقد أرسلت الرسالة.", en:"You ___ call her; I already sent the message."},
+        options:['must','don’t have to','can’t','shouldn’t'], answer:1},
+      {id:9,  cat:'Grammar', q:{ar:"الرجل الذي ___ ساعدنا يسكن بجوارنا.", en:"The man ___ helped us lives next door."},
+        options:['which','whom','who','whose'], answer:2},
+      {id:10, cat:'Grammar', q:{ar:"قالت: «سأسافر غدًا». → قالت إنها ___ في اليوم التالي.", en:"“I’m traveling tomorrow,” she said. → She said she ___ the next day."},
+        options:['is traveling','was traveling','would travel','travels'], answer:2},
+      {id:11, cat:'Grammar', q:{ar:"هو ___ دائمًا ___ هاتفه في البيت.", en:"He ___ always ___ his phone at home."},
+        options:['has / forgotten','always / forgets','has always / forgotten','is always / forgetting'], answer:3},
+      {id:12, cat:'Grammar', q:{ar:"هذا الطريق ___ من الطريق السريع.", en:"This route is ___ than the highway."},
+        options:['the most fast','more fast','faster','fastly'], answer:2},
+      {id:13, cat:'Grammar', q:{ar:"أتطلع إلى ___ رؤيتك في صنعاء.", en:"I look forward to ___ you in Sana’a."},
+        options:['see','seeing','to see','have seen'], answer:1},
+      {id:14, cat:'Grammar', q:{ar:"يرجى ___ قرار بحلول الجمعة.", en:"Please ___ a decision by Friday."},
+        options:['do','make','take','set'], answer:1},
+      {id:15, cat:'Grammar', q:{ar:"نحتاج أن ___ الاجتماع للأسبوع القادم.", en:"We need to ___ the meeting to next week."},
+        options:['put off','take off','bring up','turn up'], answer:0},
+
+      // Vocabulary (16–25)
+      {id:16, cat:'Vocab', q:{ar:"Resilient تعني:", en:"“Resilient” means:"},
+        options:['fragile','flexible and strong','temporary','impatient'], answer:1},
+      {id:17, cat:'Vocab', q:{ar:"Scarce تعني:", en:"“Scarce” means:"},
+        options:['abundant','rare','cheap','useful'], answer:1},
+      {id:18, cat:'Vocab', q:{ar:"Convey تعني:", en:"“Convey” means:"},
+        options:['hide','transport/communicate','refuse','replace'], answer:1},
+      {id:19, cat:'Vocab', q:{ar:"Meticulous تعني:", en:"“Meticulous” means:"},
+        options:['careless','detailed and careful','fast','lazy'], answer:1},
+      {id:20, cat:'Vocab', q:{ar:"Outlook تعني:", en:"“Outlook” means:"},
+        options:['view or perspective','income','schedule','excuse'], answer:0},
+      {id:21, cat:'Vocab', q:{ar:"أُغلق الطريق بسبب ___ غزيرة.", en:"The road was closed due to heavy ___ last night."},
+        options:['rain','rainy','rained','raining'], answer:0},
+      {id:22, cat:'Vocab', q:{ar:"أطلقوا ___ جديدة للترويج للسياحة.", en:"They launched a new ___ to promote tourism."},
+        options:['campaign','camping','companion','complaint'], answer:0},
+      {id:23, cat:'Vocab', q:{ar:"دفعت ___ كبيرة للتعليمات.", en:"She paid close ___ to the instructions."},
+        options:['notice','attention','concentration','look'], answer:1},
+      {id:24, cat:'Vocab', q:{ar:"عكس Expand هو:", en:"“Expand” is the opposite of:"},
+        options:['extend','enlarge','reduce','widen'], answer:2},
+      {id:25, cat:'Vocab', q:{ar:"لم تكن النتيجة كما ___", en:"The result was not what we ___"},
+        options:['expected','expecting','expect','expects'], answer:0},
+
+      // Reading (26–30)
+      {id:26, cat:'Reading', q:{ar:"الفكرة الرئيسة للمقطع: يفضّل المسافرون...", en:"Main idea: Travelers prefer..."},
+        passage:{
+          ar:"في السنوات الأخيرة، بدأ كثير من المسافرين يختارون التجارب بدل التذكارات. بدلاً من شراء الهدايا، يحجزون دروس طبخ وجولات مشي أو ورشًا مع حرفيين محليين. هذا التحول ساعد الأعمال الصغيرة ومنح الزوار فهمًا أعمق للثقافة المحلية.",
+          en:"In recent years, many travelers have started choosing experiences over souvenirs. Instead of buying gifts, they book cooking classes, walking tours, or workshops with local artisans. This shift has helped small businesses while giving visitors a deeper understanding of local culture."
+        },
+        options:[
+          'شراء هدايا أكثر من قبل / Buying more gifts than before',
+          'التجارب بدل التذكارات / Experiences over souvenirs',
+          'الورش باهظة الثمن / Workshops are too expensive',
+          'تجنب الثقافة المحلية / Avoiding local culture'
+        ],
+        answer:1
+      },
+      {id:27, cat:'Reading', q:{ar:"فائدة للمسافرين هي أنهم...", en:"One benefit for travelers is that they..."},
+        options:[
+          'يوفرون المال بتجنب الجولات / save money by avoiding tours',
+          'يحصلون على فهم أعمق / get a deeper understanding',
+          'يتلقون هدايا مجانية / receive free gifts',
+          'يتجنبون الأعمال الصغيرة / avoid small businesses'
+        ],
+        answer:1
+      },
+      {id:28, cat:'Reading', q:{ar:"أنشطة ذُكرت:", en:"Activities mentioned:"},
+        options:[
+          'متاحف وحفلات / Museums and concerts',
+          'رياضة ومهرجانات / Sports and festivals',
+          'دروس طبخ وجولات مشي / Cooking classes and walking tours',
+          'فعاليات الفنادق فقط / Hotel events only'
+        ],
+        answer:2
+      },
+      {id:29, cat:'Reading', q:{ar:"الغرض من المقطع: الناس أثناء الانقطاع...", en:"Purpose: During outages, people..."},
+        passage:{
+          ar:"خلال انقطاع الكهرباء، تتكيف المجتمعات بسرعة. تخطط العائلات أمسياتها وفق ضوء النهار، ويتشارك الجيران المولدات أو شحن الأجهزة لبعضهم. هذه الأفعال الصغيرة تقلل التوتر وتقوي الروابط الاجتماعية.",
+          en:"During power outages, communities often adapt quickly. Families plan their evenings around daylight, and neighbors share generators or charge devices for one another. These small acts of cooperation reduce stress and strengthen social bonds."
+        },
+        options:[
+          'يتشاجرون / argue',
+          'يتكيفون ويتعاونون / adapt and cooperate',
+          'يتجنبون بعضهم / avoid each other',
+          'يهدرون الموارد / waste resources'
+        ],
+        answer:1
+      },
+      {id:30, cat:'Reading', q:{ar:"معنى strengthen social bonds:", en:"“Strengthen social bonds” means:"},
+        options:[
+          'خلق مسافة / create distance',
+          'إضعاف العلاقات / make relationships weaker',
+          'تقوية العلاقات / make relationships stronger',
+          'نسيان الجيران / forget neighbors'
+        ],
+        answer:2
+      },
+    ];
+
+    const questionsEl = document.getElementById('questions');
+    const quizEl = document.getElementById('quiz');
+    const startBtn = document.getElementById('startBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const bar = document.getElementById('bar');
+    const progressText = document.getElementById('progressText');
+
+    function answered(){
+      return [...document.querySelectorAll('input[type=radio]:checked')].length;
+    }
+
+    function render(){
+      questionsEl.innerHTML = '';
+      questionsData.forEach((q,i)=>{
+        const wrap = document.createElement('div');
+        wrap.className='q';
+
+        if(q.passage){
+          const pass = document.createElement('div');
+          pass.className='muted';
+          pass.style.marginBottom='8px';
+          pass.textContent = q.passage[lang];
+          wrap.appendChild(pass);
+        }
+
+        const title = document.createElement('div');
+        title.className='q-title';
+        title.textContent = `${i+1}. ${q.q[lang]}`;
+        wrap.appendChild(title);
+
+        const opts = document.createElement('div');
+        opts.className='options';
+        q.options.forEach((opt,idx)=>{
+          const id = `q${q.id}_${idx}`;
+          const label = document.createElement('label');
+          label.className='option';
+          label.setAttribute('for', id);
+
+          const input = document.createElement('input');
+          input.type='radio'; input.name=`q${q.id}`; input.id=id; input.value=idx;
+
+          const span = document.createElement('span');
+          span.textContent = opt;
+
+          label.appendChild(input);
+          label.appendChild(span);
+          opts.appendChild(label);
+        });
+        wrap.appendChild(opts);
+        questionsEl.appendChild(wrap);
+      });
+
+      // listen for changes to update progress bar
+      questionsEl.addEventListener('change', updateProgress);
+      updateProgress();
+    }
+
+    function updateProgress(){
+      const done = answered();
+      const total = questionsData.length;
+      bar.style.width = `${(done/total)*100}%`;
+      progressText.textContent = `${lang==='ar'?i18n.ar.progress:i18n.en.progress}: ${done} / ${total}`;
+    }
+
+    function grade(){
+      let score = 0;
+      questionsData.forEach(q=>{
+        const picked = document.querySelector(`input[name="q${q.id}"]:checked`);
+        if(picked && Number(picked.value) === q.answer){ score++; }
+      });
+      return score;
+    }
+
+    function cefr(score){
+      // 0–30 scale
+      if(score<=10) return {level:'A1–A2', color:'#334155', advice:i18n[lang].tipA1};
+      if(score<=18) return {level:'B1', color:'#1d4ed8', advice:i18n[lang].tipB1};
+      if(score<=25) return {level:'B2', color:'#0ea5e9', advice:i18n[lang].tipB2};
+      return {level:'C1', color:'#16a34a', advice:i18n[lang].tipC1};
+    }
+
+    function showResults(){
+      const s = grade();
+      document.getElementById('score').textContent = `${s} / 30`;
+      const info = cefr(s);
+      const levelEl = document.getElementById('level');
+      levelEl.textContent = info.level;
+      levelEl.style.background = 'transparent';
+      levelEl.style.borderColor = info.color;
+      levelEl.style.color = info.color;
+
+      document.getElementById('advice').textContent = info.advice;
+
+      const tipsEl = document.getElementById('tips');
+      tipsEl.innerHTML = '';
+      const items = {
+        A1:'• 20 دقيقة يوميًا: 10 مفردات + 5 جمل. • فيديو قصير بترجمة إنجليزية.',
+        A2:'• 25 دقيقة: قواعد الماضي البسيط والمضارع المستمر. • كتابة يومية من 4 جمل.',
+        B1:'• 30 دقيقة: قراءة خبر قصير + تلخيص 3 جمل. • الاستماع لبودكاست بطيء 8 دقائق.',
+        B2:'• 35 دقيقة: مقال قصير أسبوعيًا. • محادثة مع شريك/معلّم 15 دقيقة يوميًا.',
+        C1:'• 40 دقيقة: TED + مفكرة مفردات متقدمة + تحرير نصوصك بدقة.'
+      };
+      // choose 2 based on level
+      const plan = info.level.startsWith('A')? ['A1','A2'] : info.level==='B1'? ['B1','B2'] : ['B2','C1'];
+      plan.forEach(k=>{
+        const li = document.createElement('li');
+        li.textContent = tipsEl.dir==='rtl' ? items[k] : items[k].replace('•','•');
+        tipsEl.appendChild(li);
+      });
+      document.getElementById('results').classList.remove('hidden');
+      document.getElementById('writing').classList.remove('hidden');
+      window.scrollTo({top:document.getElementById('results').offsetTop-20, behavior:'smooth'});
+    }
+
+    function quickWritingScore(text){
+      // تقدير بسيط جداً: طول + علامات ترقيم + تنوع مفردات
+      const len = text.trim().split(/\s+/).filter(Boolean).length;
+      const sentences = (text.match(/[.!?؟]/g)||[]).length;
+      const uniques = new Set(text.toLowerCase().replace(/[^a-z\s]/g,'').split(/\s+/).filter(w=>w.length>3)).size;
+      let score = 5;
+      if(len>45) score+=2; else if(len>30) score+=1;
+      if(sentences>=5) score+=2; else if(sentences>=3) score+=1;
+      if(uniques>18) score+=2; else if(uniques>12) score+=1;
+      return Math.max(5, Math.min(10, score));
+    }
+
+    // Events
+    startBtn.addEventListener('click', ()=>{
+      quizEl.classList.remove('hidden');
+      render();
+      window.scrollTo({top:quizEl.offsetTop-20, behavior:'smooth'});
+    });
+
+    submitBtn.addEventListener('click', showResults);
+
+    clearBtn.addEventListener('click', ()=>{
+      document.querySelectorAll('input[type=radio]').forEach(r=> r.checked=false);
+      updateProgress();
+    });
+
+    resetBtn.addEventListener('click', ()=>{
+      location.reload();
+    });
+
+    document.getElementById('scoreWriting').addEventListener('click', ()=>{
+      const txt = document.getElementById('writingText').value;
+      const s = quickWritingScore(txt||'');
+      document.getElementById('writingScore').textContent = `${s} / 10`;
+    });
+  </script>
+</body>
+</html>
